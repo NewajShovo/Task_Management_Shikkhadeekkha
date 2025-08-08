@@ -152,7 +152,7 @@ export default function RegisterPage() {
                   id="fullName"
                   name="fullName"
                   type="text"
-                  placeholder="Shovo"
+                  placeholder="Enter Your Full Name"
                   value={formData.fullName}
                   onChange={handleInputChange}
                   className="pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
@@ -174,7 +174,7 @@ export default function RegisterPage() {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="john.doe@company.com"
+                  placeholder="examaple@sda-ae.com"
                   value={formData.email}
                   onChange={handleInputChange}
                   className="pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"

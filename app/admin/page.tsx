@@ -62,6 +62,7 @@ interface Team {
 export default function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
   const [isAssignUserOpen, setIsAssignUserOpen] = useState(false);
@@ -76,6 +77,15 @@ export default function AdminPage() {
   } | null>(null);
 
   useEffect(() => {
+    let userId: string;
+    const userData = localStorage.getItem("user");
+    console.log(userData);
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      userId = parsedUser.id;
+      // console.log("User ID:", parsedUser.id); // ✅ Print user ID
+    }
     const fetchData = async () => {
       const { data: registeredUsers, error } = await supabase
         .from("Users")
@@ -335,13 +345,13 @@ export default function AdminPage() {
                   className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32&text=A" />
+                    <AvatarImage src="/placeholder-user.jpg?height=32&width=32&text=A" />
                     <AvatarFallback className="bg-blue-600 text-white">
                       A
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-gray-900 dark:text-white">
-                    Admin User
+                    {user?.name}
                   </span>
                   <ChevronDown className="w-4 h-4 text-gray-500" />
                 </Button>
@@ -352,10 +362,10 @@ export default function AdminPage() {
               >
                 <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    Admin User
+                    {user?.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    admin@company.com
+                    {user?.email}
                   </p>
                 </div>
                 <DropdownMenuItem className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
