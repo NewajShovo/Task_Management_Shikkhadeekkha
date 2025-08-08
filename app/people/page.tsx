@@ -28,10 +28,14 @@ import {
 import { da } from "date-fns/locale";
 
 // Keep Person type if needed
-export type Person = {
-  id: bigint;
+type Person = {
+  id: string;
   full_name: string;
   email: string;
+  team?: {
+    id: string;
+    name: string;
+  };
 };
 
 type ViewMode = "list" | "grid" | "teams";
@@ -42,10 +46,10 @@ export default function PeoplePage() {
   const [selectedTeam, setSelectedTeam] = useState<string>("all");
   const [people, setPeople] = useState<Person[]>([]);
   const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
-
   useEffect(() => {
     const fetchTeams = async () => {
       const { data, error } = await supabase.from("Teams").select("*");
+
       if (!error && data) setTeams(data);
     };
 
@@ -56,6 +60,46 @@ export default function PeoplePage() {
 
     fetchTeams();
     fetchPeople();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: users, error: userError } = await supabase
+        .from("Users")
+        .select("*");
+      const { data: teams, error: teamError } = await supabase
+        .from("Teams")
+        .select("*");
+      const { data: teamUsers, error: teamUsersError } = await supabase
+        .from("Team_users")
+        .select("*");
+
+      if (userError || teamError || teamUsersError) {
+        console.error("Error fetching data");
+        return;
+      }
+
+      const formattedPeople = users.map((user) => {
+        const teamUser = teamUsers.find((tu) => tu.user_id === user.id);
+        const team = teams.find((t) => t.id === teamUser?.team_id);
+
+        return {
+          id: user.id,
+          full_name: user.full_name,
+          email: user.email,
+          team: team
+            ? {
+                id: team.id,
+                name: team.name,
+              }
+            : undefined,
+        };
+      });
+
+      setPeople(formattedPeople);
+    };
+
+    fetchData();
   }, []);
 
   // Filter people based on search query and selected team
@@ -92,7 +136,7 @@ export default function PeoplePage() {
           <div className="flex items-start space-x-4">
             <div className="relative">
               <Avatar className={`${compact ? "w-10 h-10" : "w-12 h-12"}`}>
-                <AvatarImage src={"/placeholder.svg"} />
+                <AvatarImage src={"/placeholder-user.jpg"} />
                 <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white">
                   {person.full_name}
                 </AvatarFallback>
@@ -107,8 +151,10 @@ export default function PeoplePage() {
                 >
                   {person.full_name}
                 </h3>
-                {team && (
-                  <Badge className={`${team.id} text-xs`}>{team.name}</Badge>
+                {person.team && (
+                  <Badge className={`${person.team?.id} text-xs`}>
+                    {person.team?.name}
+                  </Badge>
                 )}
               </div>
               <div className="mt-1 space-y-1">

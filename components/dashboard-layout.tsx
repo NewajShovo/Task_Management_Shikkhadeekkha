@@ -71,9 +71,11 @@ export default function DashboardLayout({
   const [newProjectColor, setNewProjectColor] = useState("bg-blue-200");
   const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
 
-  // Get current user (John Doe - people_11)
-  const currentUser =
-    people.find((person) => person.id === "people_11") || people[11];
+  const retrievedUser = localStorage.getItem("user");
+
+  const currentUser = retrievedUser
+    ? (JSON.parse(retrievedUser) as { id: number; email: string; name: string })
+    : null;
 
   const sidebarItems = [
     { name: "Dashboard", icon: BarChart3, path: "/dashboard" },
@@ -127,7 +129,7 @@ export default function DashboardLayout({
       <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
         <div className="p-6">
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            Mondays
+            ShikkhaDeekhaTracker
           </h1>
         </div>
 
@@ -157,12 +159,12 @@ export default function DashboardLayout({
             <button className="w-full flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
               <HelpCircle className="w-4 h-4 mr-3" />
               Help & Support
-              <Badge
+              {/* <Badge
                 variant="secondary"
                 className="ml-auto bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300"
               >
                 8
-              </Badge>
+              </Badge> */}
             </button>
           </div>
         </div>
@@ -173,16 +175,20 @@ export default function DashboardLayout({
         <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              {/* <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
+              <div className="relative">
+                {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
                 <Input
                   placeholder="Search or type a command"
                   className="pl-10 w-80 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                />
-              </div> */}
+                /> */}
+                {/* মননে সৃষ্টির বিকাশ */}
+              </div>
+              {/* মননে সৃষ্টির বিকাশ */}
             </div>
-
+            {/* মননে সৃষ্টির বিকাশ - শিক্ষাদীক্ষা */}
+            <strong>মননে সৃষ্টির বিকাশ - শিক্ষাদীক্ষা</strong>
             <div className="flex items-center space-x-4">
+              {/* মননে সৃষ্টির বিকাশ */}
               {/* <div className="flex items-center">
                 <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-r-none">
                   <Plus className="w-4 h-4 mr-2" />
@@ -213,9 +219,7 @@ export default function DashboardLayout({
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div> */}
-
               <ThemeToggle />
-
               {/* <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">
@@ -273,20 +277,19 @@ export default function DashboardLayout({
                   </div>
                 </PopoverContent>
               </Popover> */}
-
               <Popover>
                 <PopoverTrigger asChild>
                   <Avatar className="w-8 h-8 cursor-pointer">
                     <AvatarImage
                       // src={currentUser.imageURL || "/placeholder.svg"}
-                      src={"/placeholder.svg"}
+                      src={"/placeholder-user.jpg"}
                     />
-                    <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">
+                    {/* <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">
                       {currentUser.name
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
-                    </AvatarFallback>
+                    </AvatarFallback> */}
                   </Avatar>
                 </PopoverTrigger>
                 <PopoverContent
@@ -296,22 +299,21 @@ export default function DashboardLayout({
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
                       <Avatar className="w-12 h-12">
-                        <AvatarImage
-                          src={currentUser.imageURL || "/placeholder.svg"}
-                        />
-                        <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">
-                          {currentUser.name
+                        <AvatarImage src={"/placeholder-user.jpg"} />
+                        {/* <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">
+                          {currentUser.
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
-                        </AvatarFallback>
+                          {"Shovo"}
+                        </AvatarFallback> */}
                       </Avatar>
                       <div>
                         <p className="font-semibold text-gray-900 dark:text-white">
-                          {currentUser.name}
+                          {currentUser?.name}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-300">
-                          {currentUser.email}
+                          {currentUser?.email}
                         </p>
                       </div>
                     </div>

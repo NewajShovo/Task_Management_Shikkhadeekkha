@@ -445,7 +445,7 @@ export default function TasksPage() {
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center space-x-2">
                     <Avatar className="w-6 h-6">
-                      <AvatarImage src={"/placeholder.svg"} />
+                      <AvatarImage src={"/placeholder-user.jpg"} />
                       <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white text-xs">
                         {assignedUser?.full_name
                           .split(" ")

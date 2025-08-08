@@ -68,3 +68,75 @@ export const isOverdue = (dateString: string): boolean => {
   const now = new Date();
   return date < now;
 };
+
+// Mock tasks data
+export const mockTasks: Task[] = [
+  {
+    id: "task_1",
+    title: "Design new landing page",
+    description:
+      "Create a modern, responsive landing page for the new product launch",
+    assignedBy: "people_11", // Current user
+    assignedTo: "people_0", // Lily Grace
+    dueDate: "2024-02-15",
+    priority: "high",
+    status: "in-progress",
+    createdAt: "2024-01-20T10:00:00Z",
+    project: "Website Redesign",
+    tags: ["design", "ui", "landing-page"],
+  },
+  {
+    id: "task_2",
+    title: "API Integration Testing",
+    description: "Test all API endpoints and ensure proper error handling",
+    assignedBy: "people_1", // Adam Reid
+    assignedTo: "people_11", // Current user
+    dueDate: "2024-01-25",
+    priority: "medium",
+    status: "pending",
+    createdAt: "2024-01-18T14:30:00Z",
+    project: "Backend Development",
+    tags: ["testing", "api", "backend"],
+  },
+  {
+    id: "task_3",
+    title: "User Research Analysis",
+    description:
+      "Analyze user feedback from recent surveys and create actionable insights",
+    assignedBy: "people_11", // Current user
+    assignedTo: "people_9", // Isla Brooke
+    dueDate: "2024-01-30",
+    priority: "medium",
+    status: "completed",
+    createdAt: "2024-01-15T09:15:00Z",
+    completedAt: "2024-01-22T16:45:00Z",
+    project: "User Experience",
+    tags: ["research", "analysis", "ux"],
+  },
+  {
+    id: "task_4",
+    title: "Database Optimization",
+    description: "Optimize database queries and improve performance",
+    assignedBy: "people_6", // Miles Parker
+    assignedTo: "people_11", // Current user
+    dueDate: "2024-02-01",
+    priority: "high",
+    status: "in-progress",
+    createdAt: "2024-01-19T11:20:00Z",
+    project: "Performance",
+    tags: ["database", "optimization", "performance"],
+  },
+  {
+    id: "task_5",
+    title: "Marketing Campaign Review",
+    description: "Review and approve Q1 marketing campaign materials",
+    assignedBy: "people_11", // Current user
+    assignedTo: "people_5", // Ella Rae
+    dueDate: "2024-01-28",
+    priority: "low",
+    status: "pending",
+    createdAt: "2024-01-21T13:45:00Z",
+    project: "Marketing",
+    tags: ["marketing", "review", "campaign"],
+  },
+];
