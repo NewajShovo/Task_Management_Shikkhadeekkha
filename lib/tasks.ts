@@ -1,3 +1,18 @@
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  assignedBy: string; // user ID who assigned the task
+  assignedTo: string; // user ID who received the task
+  dueDate: string;
+  priority: "low" | "medium" | "high";
+  status: "pending" | "in-progress" | "completed";
+  createdAt: string;
+  completedAt?: string;
+  project?: string;
+  tags: string[];
+}
+
 export const priorities = [
   {
     value: "low",
