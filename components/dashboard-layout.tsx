@@ -282,7 +282,7 @@ export default function DashboardLayout({
                   <Avatar className="w-8 h-8 cursor-pointer">
                     <AvatarImage
                       // src={currentUser.imageURL || "/placeholder.svg"}
-                      src={"/placeholder-user.jpg"}
+                      src={"/placeholder.jpg"}
                     />
                     {/* <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">
                       {currentUser.name
@@ -299,7 +299,7 @@ export default function DashboardLayout({
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
                       <Avatar className="w-12 h-12">
-                        <AvatarImage src={"/placeholder-user.jpg"} />
+                        <AvatarImage src={"/placeholder.jpg"} />
                         {/* <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">
                           {currentUser.
                             .split(" ")

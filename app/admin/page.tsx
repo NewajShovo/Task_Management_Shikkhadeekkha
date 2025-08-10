@@ -33,6 +33,7 @@ import {
   Plus,
   Pencil,
   Trash2,
+  User,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -166,6 +167,11 @@ export default function AdminPage() {
     setAlert({ type, message });
     setTimeout(() => setAlert(null), 2800);
   };
+  const retrievedUser = localStorage.getItem("user");
+
+  const currentUser = retrievedUser
+    ? (JSON.parse(retrievedUser) as { id: number; email: string; name: string })
+    : null;
 
   // Users
   const [users, setUsers] = useState<DBUser[]>([]);
@@ -388,12 +394,47 @@ export default function AdminPage() {
         if (selectedUserForReports && selectedUserForReports !== "all") {
           params.set("userId", selectedUserForReports);
         }
+
         const res = await fetch(
           `/api/admin/daily-reports?${params.toString()}`
         );
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch reports");
-        setReports(data.reports || []);
+
+        // Group by date
+        const groupedReports: DBReport[] = Object.values(
+          (data.reports || []).reduce(
+            (acc: Record<string, DBReport>, report: DBReport) => {
+              const dateKey = new Date(report.created_at)
+                .toISOString()
+                .split("T")[0]; // YYYY-MM-DD
+
+              if (!acc[dateKey]) {
+                acc[dateKey] = {
+                  ...report,
+                  work_items: [report.work_items],
+                  summary: report.summary || "",
+                };
+              } else {
+                // Merge work_items
+                acc[dateKey].work_items.push(report.work_items);
+                // Merge summaries
+                const newSummary = report.summary ? report.summary : "";
+                if (newSummary) {
+                  acc[dateKey].summary = acc[dateKey].summary
+                    ? `${acc[dateKey].summary}\n${newSummary}`
+                    : newSummary;
+                }
+              }
+              return acc;
+            },
+            {} as Record<string, DBReport>
+          )
+        );
+
+        setReports(groupedReports);
+
+        setReports(groupedReports);
       } catch (e: any) {
         setReportsError(e.message || "Failed to fetch reports");
       } finally {
@@ -566,13 +607,13 @@ export default function AdminPage() {
                   className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                    <AvatarImage src="/placeholder.jpg?height=32&width=32" />
                     <AvatarFallback className="bg-blue-600 text-white">
                       A
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-gray-900 dark:text-white">
-                    Admin User
+                    {currentUser?.name}
                   </span>
                   <ChevronDown className="w-4 h-4 text-gray-500" />
                 </Button>
@@ -583,10 +624,10 @@ export default function AdminPage() {
               >
                 <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    Admin User
+                    {currentUser?.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    admin@company.com
+                    {currentUser?.email}
                   </p>
                 </div>
                 <DropdownMenuItem className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -730,7 +771,7 @@ export default function AdminPage() {
                               <AvatarImage
                                 src={
                                   user.avatar_url ||
-                                  `/placeholder.svg?height=48&width=48&query=${encodeURIComponent(
+                                  `/placeholder.jpg?height=48&width=48&query=${encodeURIComponent(
                                     `avatar ${
                                       user.full_name || user.email || "user"
                                     }`
@@ -1088,7 +1129,7 @@ export default function AdminPage() {
                               `User ${memberId}`;
                             const avatar =
                               member?.avatar_url ||
-                              `/placeholder.svg?height=32&width=32&query=${encodeURIComponent(
+                              `/placeholder.jpg?height=32&width=32&query=${encodeURIComponent(
                                 `avatar ${displayName}`
                               )}`;
                             const initials =
@@ -1105,7 +1146,7 @@ export default function AdminPage() {
                                 <div className="flex items-center gap-3">
                                   <Avatar className="w-8 h-8">
                                     <AvatarImage
-                                      src={avatar || "/placeholder.svg"}
+                                      src={avatar || "/placeholder.jpg"}
                                     />
                                     <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white text-xs">
                                       {initials}
@@ -1634,7 +1675,7 @@ export default function AdminPage() {
                     u?.full_name || u?.email || `User ${report.user_id ?? ""}`;
                   const avatar =
                     u?.avatar_url ||
-                    `/placeholder.svg?height=40&width=40&query=${encodeURIComponent(
+                    `/placeholder.jpg?height=40&width=40&query=${encodeURIComponent(
                       `avatar ${name}`
                     )}`;
                   const workItems: string[] = Array.isArray(report.work_items)
@@ -1654,7 +1695,7 @@ export default function AdminPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             <Avatar className="w-10 h-10">
-                              <AvatarImage src={avatar || "/placeholder.svg"} />
+                              <AvatarImage src={avatar || "/placeholder.jpg"} />
                               <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white">
                                 {(name || "U")
                                   .split(" ")
@@ -1672,9 +1713,9 @@ export default function AdminPage() {
                               </p>
                             </div>
                           </div>
-                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                          {/* <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
                             {workItems.length} items completed
-                          </Badge>
+                          </Badge> */}
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4">
