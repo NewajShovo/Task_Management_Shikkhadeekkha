@@ -1,0 +1,20 @@
+name: Deploy to DigitalOcean Droplet
+
+on:
+  push:
+    branches:
+      - master # change if your branch is different
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: |
+            /var/www/tracker/deploy.sh
