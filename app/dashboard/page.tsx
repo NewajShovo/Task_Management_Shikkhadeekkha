@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, act } from "react";
+import { useState, useEffect, act, use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,10 +45,9 @@ export default function DashboardPage() {
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser);
       userId = parsedUser.id;
-      // console.log("User ID:", parsedUser.id); // ✅ Print user ID
     }
-    // console.log(userData);
 
+    console.log("Hello: ", userData, user);
     // Load saved work items
     const savedWorkItems = localStorage.getItem("dailyWorkItems");
     if (savedWorkItems) {
@@ -60,7 +59,7 @@ export default function DashboardPage() {
       setWorkSummary(savedSummary);
     }
     const fetchData = async () => {
-      const activity = await fetchLast7DaysActivity(); // This returns Promise<Activity[]>
+      const activity = await fetchLast7DaysActivity(userId); // This returns Promise<Activity[]>
       setSevenDaysActivity(activity); // Now activity is resolved, so this works.
     };
     fetchData();
@@ -153,7 +152,8 @@ export default function DashboardPage() {
     return formatted;
   };
 
-  const fetchLast7DaysActivity = async () => {
+  const fetchLast7DaysActivity = async (userId?: string) => {
+    console.log(user);
     const { data, error } = await supabase
       .from("Daily_work_logs")
       .select("created_at, work_items")
@@ -162,14 +162,15 @@ export default function DashboardPage() {
         new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)
           .toISOString()
           .split("T")[0]
-      );
+      )
+      .eq("user_id", userId);
 
     if (error) {
       console.error("Supabase fetch error:", error);
       return [];
     }
+    console.log("Data found!!!", data);
     const activity = formatActivityData(data);
-    console.log(activity);
     return activity;
   };
 
@@ -189,11 +190,21 @@ export default function DashboardPage() {
   };
 
   const saveWorkSummary = async () => {
+    // Ensure workItems is a valid array
+    const validWorkItems = Array.isArray(workItems) ? workItems : [];
+    // Warn if workItems is empty
+    if (validWorkItems.length === 0) {
+      const proceed = confirm(
+        "⚠️ You have no work items. Please add work items"
+      );
+      return; // user chose to cancel
+    }
+
     // Save to Supabase
     const { data, error } = await supabase.from("Daily_work_logs").insert([
       {
-        summary: workSummary,
-        work_items: workItems, // Make sure this is a valid JSON object or array
+        summary: workSummary || "", // fallback to empty string if null
+        work_items: validWorkItems,
         user_id: user.id,
       },
     ]);
@@ -205,11 +216,13 @@ export default function DashboardPage() {
       alert("✅ Work summary saved successfully!");
       console.log("Supabase response:", data);
     }
-    console.log(workSummary, workItems);
 
-    localStorage.setItem("workSummary", workSummary);
-    // In a real app, this would send to backend
-    alert("Work summary saved successfully!");
+    // Reload page to clear inputs
+    setWorkSummary("");
+    setWorkItems([]);
+    localStorage.setItem("workSummary", "");
+    localStorage.setItem("dailyWorkItems", "");
+    window.location.reload();
   };
 
   if (!user) {
@@ -399,7 +412,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {sevenDaysActivity.length === 0 ? (
-              <p className="text-sm text-gray-500">Loading activity...</p>
+              <p className="text-sm text-gray-500">No Data Found</p>
             ) : (
               sevenDaysActivity.map((day, index) => (
                 <div

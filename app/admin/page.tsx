@@ -60,6 +60,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { da } from "date-fns/locale";
 
 // Schema-backed types
 type DBUser = {
@@ -399,6 +400,7 @@ export default function AdminPage() {
           `/api/admin/daily-reports?${params.toString()}`
         );
         const data = await res.json();
+        console.log("Daily-Reports", data);
         if (!res.ok) throw new Error(data.error || "Failed to fetch reports");
 
         // Group by date
@@ -409,20 +411,23 @@ export default function AdminPage() {
                 .toISOString()
                 .split("T")[0]; // YYYY-MM-DD
 
-              if (!acc[dateKey]) {
-                acc[dateKey] = {
+              // 🔑 Combine date and report.user_id (or report.id)
+              const key = `${dateKey}-${report.user_id}`;
+
+              if (!acc[key]) {
+                acc[key] = {
                   ...report,
                   work_items: [report.work_items],
                   summary: report.summary || "",
                 };
               } else {
                 // Merge work_items
-                acc[dateKey].work_items.push(report.work_items);
+                acc[key].work_items.push(report.work_items);
                 // Merge summaries
                 const newSummary = report.summary ? report.summary : "";
                 if (newSummary) {
-                  acc[dateKey].summary = acc[dateKey].summary
-                    ? `${acc[dateKey].summary}\n${newSummary}`
+                  acc[key].summary = acc[key].summary
+                    ? `${acc[key].summary}\n${newSummary}`
                     : newSummary;
                 }
               }
@@ -432,9 +437,12 @@ export default function AdminPage() {
           )
         );
 
+        console.log("GroupReports", groupedReports);
+
         setReports(groupedReports);
 
         setReports(groupedReports);
+        console.log(groupedReports);
       } catch (e: any) {
         setReportsError(e.message || "Failed to fetch reports");
       } finally {
